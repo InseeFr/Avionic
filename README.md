@@ -9,9 +9,9 @@ Contents :
 - license
 - avionic.pdf : a french tutorial to learn how to use the programs
 - data from insee.fr that can be used for testing tuto_avionic.R
-- Unfortunately, data from OECD is too heavy to be uploaded here, if you want a R version of these tables, let me know, we'll work it out
+- Unfortunately, data from OECD is too heavy to be uploaded here, if you want a R version of these tables, let us know, we'll work it out
 
-There is also a tutorial video here : https://www.youtube.com/watch?v=0zQVsNSFp3c&feature=youtu.be
+There is also a tutorial video here : tbd
 
 **How to use it**
 
