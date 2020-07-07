@@ -9,8 +9,9 @@ Contents :
 - license
 - avionic.pdf : a french tutorial to learn how to use the programs
 - data from insee.fr that can be used for testing tuto_avionic.R
+- data from oecd.org that can be used for testing tuto_avionic.R
 
-There is also a tutorial video here : a_remplir
+There is also a tutorial video here : https://www.youtube.com/watch?v=0zQVsNSFp3c&feature=youtu.be
 
 **How to use it**
 
