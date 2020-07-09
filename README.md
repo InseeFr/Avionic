@@ -11,7 +11,7 @@ Contents :
 - data from insee.fr that can be used for testing tuto_avionic.R
 - Unfortunately, data from OECD is too heavy to be uploaded here, if you want a R version of these tables, let us know, we'll work it out
 
-There is also a tutorial video here : tbd
+There is also a tutorial video here : https://www.youtube.com/watch?v=0zQVsNSFp3c&feature=youtu.be
 
 **How to use it**
 
