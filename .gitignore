@@ -1,0 +1,9 @@
+# R files
+.Rhistory
+.RData
+.Ruserdata
+# RStudio files
+.Rproj.user
+# MacOS
+.DS_Store
+*.icloud
