@@ -1,0 +1,329 @@
+\documentclass[a4paper,french,11pt]{article}
+\usepackage{fullpage,hyperref}
+%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{tabularx}
+\usepackage{eurosym}
+\usepackage[nottoc,notlof,notlot]{tocbibind}
+\usepackage{bbold}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+
+
+\usepackage{titling}
+
+\renewcommand{\maketitlehooka}{\includegraphics[scale=0.3]{Logo_Insee.png}}
+
+
+\title{Tutoriel Avionic}
+\author{Fran\c cois Limousin}
+\date{\today}
+
+
+\begin{document}
+
+%\maketitlehooka
+
+
+\maketitle
+
+\section{Objectif}
+
+
+Le mod\`ele Avionic (Analyse Variantielle Input/Output Nationale, Import\'ee et en Contenus) d\'evelopp\'e par le d\'epartement des comptes nationaux de l'Insee est ouvert en acc\`es libre sur Github ici : \url{https://github.com/InseeFr/Avionic}. Le but de ce document est de pr\'esenter les diff\'erents programmes mis \`a disposition sur la plateforme et leur articulation afin de permettre \`a chacun d'utiliser le mod\`ele Avionic. Ce mod\`ele permet trois types de travaux : 
+\begin{itemize}
+\item Calculer les contenus en importations, en valeur ajout\'ee, en emploi de la demande finale.
+\item Simuler un choc de demande et en voir les effets.
+\item Simuler une variation de prix de la production et en voir les effets.
+\end{itemize}
+Les calculs peuvent \^etre r\'ealis\'es sur les donn\'ees fran\c caises. Ils peuvent aussi \^etre r\'ealis\'es sur des bases de donn\'ees internationales, \`a des fins de comparaisons entre pays. Il est aussi possible de produire des r\'esultats par cat\'egories de m\'enages ainsi qu'\`a diff\'erents niveaux de nomenclature. La m\'ethodologie du mod\`ele est expliqu\'ee dans un document de travail t\'el\'echargeable ici : \url{https://www.insee.fr/fr/statistiques/3970824}. Sa lecture est fortement conseill\'ee avant d'utiliser les programmes mis en ligne.
+
+
+\section{Contenu d'Avionic}
+
+\subsection{Vue d'ensemble des programmes disponibles}
+
+Onze programmes sont mis \`a disposition sur la plateforme. Le programme \verb|tuto_avionic| est le programme central qui permet d'utiliser le mod\`ele Avionic. Tous les autres programmes sont transparents pour l'utilisateur et seront appel\'es automatiquement lors du lancement du programme \verb|tuto_avionic|. Parmi les 10 programmes appel\'es automatiquement, on distingue ceux qui servent au lancement du mod\`ele proprement dit, sur donn\'ees fran\c caises ou internationales (programmes intitul\'es "\verb|contenus_|" ou "\verb|variation_|" des programmes qui permettent ensuite de pr\'esenter les r\'esultats du mod\`ele sous d'autres angles (niveau de nomenclature ou par cat\'egorie de m\'enages : programmes intitul\'es "\verb|Avionic_agregations|" et "\verb|Avionic CMpC|" et des autres programmes qui servent pour des calculs interm\'ediaires ou des mise en forme de donn\'ees.
+
+
+\begin{itemize}
+
+\item \verb|tuto_avionic| : programme \`a lancer et \`a suivre pour mettre en \oe{}uvre les calculs et simulations d'avionic. Ce document d\'ecrit les sorties de ce programme pas \`a pas.
+
+\item \verb|contenus.R| : permet de calculer les contenus en importations, en valeur ajout\'ee et en emploi de la demande finale  en France.
+\item \verb|contenus_international.R| : permet de calculer les contenus en importations et en valeur ajout\'ee de la demande finale avec les ventilations des bases inter-pays (international).
+\item \verb|variation_df.R| : permet de simuler les effets d'un choc exog\`ene de demande finale.
+\item \verb|variation_df_international.R| : permet de simuler les effets d'un choc exog\`ene de demande finale par pays.
+\item \verb|variation_prix.R| : permet de simuler la variation du prix de production en fonction d'un choc exog\`ene de prix.
+\item \verb|variation_prix_international.R| : permet de simuler la variation du prix de production en fonction d'un choc exog\`ene de prix par pays.
+\item \verb|Avionic_agregations.R| : permet d'agr\'eger \`a diff\'erents niveaux de nomenclatures les donn\'ees.
+\item \verb|Avionic_CMpC.R| : permet d'appliquer les r\'esultats d'Avionic au compte des m\'enages par catégories.
+\item \verb|decoupage_international.R| : permet de d\'ecouper les donn\'ees par pays et d'utiliser ensuite les bases inter-pays.
+\item \verb|fonctions.R| : cr\'ee des fonctions de calculs interm\'ediaires qui seront utilis\'ees dans d'autres programmes. 
+
+\end{itemize}
+
+
+\subsection{Environnement de travail}
+
+Les programmes fournis ont \'et\'e \'ecrits et fonctionnent sous RStudio, version 1.2.1335, utilisant la version 3.6.3 de R. Ils requi\`erent le chargement des packages suivant :
+\begin{itemize}
+    \item stringr pour la partie "bases internationales"
+    \item sqldf pour les fonctions d'agr\'egation
+\end{itemize}
+
+
+\subsection{Encodage}
+
+Les programmes R ont \'et\'e encod\'e en "ISO-8859-1". Cela peut mener \`a des probl\`emes de compatibilit\'e. Pour rem\'edier \`a cela, deux solutions sont possibles. Il est possible d'ouvrir les programmes avec un lecteur de type Notepad et les enregistrer avec un autre encodage. Ou alors, au moment de l'appel des programmes dans le programme principal (utilisation de la fonction "source"), il faut ajouter l'option "\verb|encoding='UTF_8'|".
+
+
+
+\section{D\'etail des programmes}
+
+Dans cette partie est pr\'esent\'e le d\'eroul\'e du contenu du programme \verb|tuto_avionic| afin d'aider l'utilisateur \`a en comprendre les diff\'erentes composantes et \`a pouvoir ainsi utiliser le mod\`ele Avionic pour tous les types de travaux propos\'es.
+
+\subsection{\'Etapes pr\'eliminaires au lancement du mod\`ele}
+
+\subsubsection{R\'ecup\'eration des sources qui alimentent le mod\`ele}
+
+Premi\`erement, il faut rassembler les donn\'ees qui vont \^etre mobilis\'ees par Avionic. On peut distinguer ces donn\'ees de la mani\`ere suivante : 
+
+
+\begin{itemize}
+
+\item des donn\'ees de comptabilit\'e nationale : Le Tableau des Entr\'ees Interm\'ediaires (TEI) import\'e et domestique, la production, la consommation des m\'enages import\'ee et domestique, la demande finale import\'ee et domestique, la r\'epartition de l'emploi salari\'e par produits. Ces donn\'ees sont disponibles sur le site de l'Insee\footnote{\url{https://www.insee.fr/fr/statistiques/3547474?sommaire=3547646#titre-bloc-118} pour les donn\'ees issues du TES sym\'etrique le plus r\'ecent, \url{https://www.insee.fr/fr/statistiques/4131381?sommaire=4131436} pour les donn\'ees concernant l'emploi.}. Un exemple de ces donn\'ees est disponible sur le Github d'Avionic.
+    
+\item des donn\'ees sp\'ecifiques \`a Avionic : les coefficients de transmission et un exemple de variation de demande finale. Elles sont disponibles sur le Github d'Avionic.
+
+\item des donn\'ees n\'ecessaires aux \'etapes d'agr\'egation et d'application au compte des m\'enages par cat\'egories : des tables de passage, une table d'exemple ainsi que la structure du compte des m\'enages par cat\'egories. Elles sont disponibles sur le Github d'Avionic.
+
+\item des donn\'ees internationales, disponibles sur le site de l'OCDE ou d'Eurostat, par exemple ici : \url{https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm}
+    
+\end{itemize}
+
+\subsubsection{Mise en forme des sources qui alimentent le mod\`ele}
+
+Pour \^etre utilisable par les programmes d'Avionic, ces donn\'ees doivent \^etre mise en forme d'une mani\`ere sp\'ecifique. Les donn\'ees issues du Github d'Avionic sont d\'ej\`a au format requis.
+
+\begin{itemize}
+
+\item Les donn\'ees de comptabilit\'e nationales doivent \^etre plac\'ees dans un fichier csv, sans nom de variable. Le s\'eparateur des d\'ecimales est un "." et le s\'eparateur des colonnes un ";". Les vecteurs (la production, la consommation des m\'enages import\'ee et domestique, la demande finale import\'ee et domestique, la r\'epartition de l'emploi salari\'e par produits) doivent \^etre pr\'esent\'es en ligne.
+
+\item Les donn\'ees sp\'ecifiques \`a Avionic ou n\'ecessaires aux \'etapes d'agr\'egation et d'application au compte des m\'enages par cat\'egories sont d\'ej\`a au format requis. Les coefficients de transmission sont un vecteur colonne dans un fichier csv.  L'exemple de variation de demande finale est un vecteur contenant la variation que l'on veut simuler sur les produits voulus et des 0 pour les autres produits, il contient une seule ligne. Ces deux fichiers contiennent autant de cases que le niveau d'agr\'egation auquel on travaille\footnote{Attention, lorsqu'on travaille au niveau A38 par exemple, il n'y a que 37 colonnes car le produit "loyers imput\'es" est un sous-produit des activit\'es immobili\`eres}. Les tables de passage sont des jeux de coefficients ou des listes d'item en colonnes. La structure du compte des m\'enages pas cat\'egories est une table par nomenclature fonctinnelle contenant les r\'epartitions des m\'enages suivant diff\'erentes cat\'egories. Il s'agit d'un fichier csv de 32 lignes et 43 colonnes.
+
+\item les donn\'ees internationales sont trouvables sur les sites de l'OCDE ou d'Eurostat. On fournit en exemple des donn\'ees issues de l'OCDE mise en forme pour \^etre exploit\'ee par les programmes d'Avionic.
+
+\end{itemize}
+
+\subsubsection{Cr\'eation de l'arborescence, appel des sources et import de donn\'ees}
+
+Une fois au format requis, ces donn\'ees doivent \^etre regroup\'ees de la mani\`ere suivante : 
+
+\begin{itemize}
+
+\item les donn\'ees de comptabilit\'e nationale et celles sp\'ecifiques \`a Avionic dans un dossier commun.
+\item les donn\'ees internationales dans un dossier commun. 
+\item les donn\'ees n\'ecessaires aux \'etapes d'agr\'egation et d'application au compte des m\'enages par cat\'egories dans un dossier commun.
+
+\end{itemize}
+
+De plus, l'ensemble des programmes doivent figur\'es dans un m\^eme dossier.
+
+Une fois ces \'etapes accomplies, on peut commencer \`a d\'erouler le programme \verb|tuto_avionic|. Premi\`erement, on d\'efinit les diff\'erents chemins des dossiers contenant les donn\'ees et les programmes. Pour cela on attribue aux variables :
+
+\begin{itemize}
+    \item \verb|chemin_data| le nom du dossier contenant les donn\'ees de comptabilit\'e nationale et celles sp\'ecifiques \`a Avionic .
+    \item \verb|chemin_data_inter| le nom du dossier contenant les donn\'ees internationales.
+    \item \verb|chemin_data_agregation| le nom du dossier contenant les donn\'ees n\'ecessaires aux \'etapes d'agr\'egation et d'application au compte des m\'enages par cat\'egories.
+    \item \verb|chemin_prog| le nom du dossier contenant l'ensemble des programmes.
+\end{itemize}
+
+Dans un premier temps, le programme \verb|tuto_avionic| appelle un ensemble de fonctions de calculs et d'imports. Puis il charge les donn\'ees de comptabilit\'e nationale et celles sp\'ecifiques \`a Avionic. Pour cela, il faut pour chaque item mettre le nom du fichier correspondant.
+
+
+\subsection{Calcul des contenus de la demande finale en importation, VA et emploi}
+
+L'utilisation du mod\`ele proprement dit commence maintenant : les commandes suivantes importent le programme \verb|contenus.R| et l'utilisent pour calculer les contenus en importations, en valeur ajout\'ee et en emploi de la demande finale.
+%(il faut se replacer dans le dossier contenant les programmes).
+
+\subsubsection{Contenus en importation de la demande finale}
+Le programme commence par calculer le contenu en importation de la demande finale. Il s'agit de la somme des contenus directs (consommation finale) et des contenus indirects (consommation interm\'ediaires de la production consmm\'ee). Les contenus indirects sont calcul\'es \`a partir de matrices de coefficients techniques repr\'esentant les quantit\'es de produits n\'ecessaires \`a la production.
+
+La fonction \verb|contenus_imp| retourne une liste de 6 objets :
+\begin{itemize}
+\item Les contenus en importation en valeur et en part de la consommation des ménages
+\item Les contenus directs en importation en valeur et en part de la consommation des ménages
+\item Les contenus indirects en importation en valeur et en part de la consommation des ménages
+
+\end{itemize}
+
+
+\subsubsection{Contenus en valeur ajout\'ee de la demande finale}
+Pour le contenu en valeur ajout\'ee de la demande finale, la fonction \verb|contenus_va| commence par cr\'eer une matrice diagonale de valeur ajout\'ee pour lui appliquer les coefficients techniques domestiques et la consommation finale domestique. Sont ensuite calcul\'es les contenus en valeur ajout\'ee directs et indirects.
+La fonction \verb|contenus_va| retourne une liste de 6 objets :
+\begin{itemize}
+\item Les contenus en valeur ajout\'ee en valeur et en part de la consommation des ménages
+\item Les contenus directs en valeur ajout\'ee en valeur et en part de la consommation des ménages
+\item Les contenus indirects en valeur ajout\'ee en valeur et en part de la consommation des ménages
+
+\end{itemize}
+
+\subsubsection{Contenus en emploi de la demande finale}
+
+Pour le contenu en emploi (en \'equivalent temps plein ou en personnes physiques) de la demande finale, la fonction \verb|contenus_emploi| fonctionne de la m\^eme mani\`ere que \verb|contenus_va|. 
+
+La fonction \verb|contenusemploi| retourne une liste de 6 objets :
+\begin{itemize}
+\item Le contenu en emplois total pour chaque produits, ainsi que le nombre d'emploi par million d'euros du produit consid\'er\'e
+\item Le contenu direct en emplois pour chaque produits, ainsi que le nombre d'emploi par million d'euros du produit consid\'er\'e
+\item Le contenu indirect en emplois pour chaque produits, ainsi que le nombre d'emploi par million d'euros du produit consid\'er\'e
+
+\end{itemize}
+
+\subsection{Effet d'un choc exog\`ene de demande finale}
+
+Le programme \verb|tuto_avionic.R| appelle maintenant le programme \verb|variation_df.R| qui permet de simuler un choc exog\`ene de demande finale en calculant les variations de production, d'importations et d'emplois qui s'ensuivraient. Pour cela, c'est un choc de 5 milliards d'euros sur le premier produit du niveau 38, \og Agriculture, sylviculture et p\^eche\fg~ qui est simul\'e dans la table \verb|var_df| qui est appel\'ee dans les fonctions qui suivent.
+
+Les trois fonctions \verb|variation_prod|, \verb|variation_imp| et \verb|variation_emploi| fonctionnent de la m\^eme mani\`ere. Elles appliquent une demande finale domestique artificiellement modifi\'ee du choc voulu (le vecteur \verb|var_df|) et calculent les effets directs et indirects sur la production, les importations et les emplois. Ces fonctions retournent :
+\begin{itemize}
+\item La variation de la variable consid\'er\'ee
+\item La variation directe de la variable consid\'er\'ee
+\item La variation indirecte de la variable consid\'er\'ee
+\item La valeur du vecteur calcul\'e en prenant en compte le choc simul\'e \verb|var_df|
+\end{itemize}
+La fonction \verb|variation_imp| retourne aussi la valeur du vecteur des importation sans ce choc de demande finale
+
+\subsection{Effet d'un choc exog\`ene de prix}\label{1}
+
+Le programme \verb|tuto_avionic.R| appelle maintenant le programme \verb|variation_prix.R| qui permet de simuler un choc de prix. Cette simulation suppose certaines hypoth\`eses suppl\'ementaires pour \^etre valable\footnote{Voir le document de travail, page 15}. De plus, les interpr\'etations des r\'esultats seront diff\'erentes suivant que l'on utilise un TEI domestique ou bien un TEI total (somme du TEI domestique et du TEI import\'e). De m\^eme, il est possible de r\'ealiser cette simulation en utilisant ou non des coefficients de transmission. Ces coefficients repr\'esentent la proportion d’une variation de co\^ut transmise par les entreprises d’une branche à ses clients{Voir le document de travail, page 18}.
+La fonction \verb|variation_prix| prend en entr\'ee : 
+\begin{itemize}
+\item un TEI (domestique ou total)
+\item un vecteur de production
+\item le num\'ero  du produit dont on veut simuler un choc de prix dans la nomenclature. Ainsi pour simuler un choc de prix sur les industries extractives, on utilisera le num\'ero 2.
+\item une variation de prix en pourcentage
+\item \verb|coeff_trans| pour utiliser les coefficients de transmission, rien pour les ignorer
+
+\end{itemize} 
+
+Elle retourne :
+
+\begin{itemize}
+\item La varition totale, direct et indirecte par produit du prix de ces produits en pourcentage.
+\item La variation totale du prix de tous les produits en pourcentage.
+\item L'\'elasticit\'e prix, soit l'augmentation des prix au total pour une hausse de $1\%$ du prix du produit pour lequel on simule le choc.
+
+\end{itemize} 
+
+
+\subsection{\'Etude \`a partir des bases internationales}
+
+\subsubsection{D\'ecoupage international}
+
+Pour travailler sur les bases internationales\footnote{voir le document de travail, page 34}, il faut charger les donn\'ees internationales. L'exemple sera fait ici sur les bases Tiva (ou ICIO) de l'OCDE, sur 69 pays et 36 produits. Les donn\'ees peuvent \^etre t\'el\'echarg\'ees ici :
+
+\url{https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm}
+
+Le programme permet de charger et r\'epartir les donn\'ees entre TEI, production, consommation. Il cr\'ee aussi la liste des pays, en cr\'eant une liste \verb|pays| et une liste \verb|pays2| qui ne contient pas le reste du monde (ROW) et les pays avec donn\'ees manquantes.
+
+La fonction \verb|decoupage_tei| prend en entr\'ee la matrice des TEI, la liste des pays, le nombre de produits concern\'es, le nombre de pays et un chemin vers le dossier dans lequel seront cr\'eer les fichiers contenant les TEI. Pour chaque pays, sont cr\'ees un TEI domestique et un TEI import\'e depuis chacun des autres pays.
+
+La fonction \verb|decoupage_prod| prend les m\^emes \'el\'ements en entr\'ee (avec la production au lieu des TEI) et cr\'ee les vecteurs de production de chaque pays dans le dossier voulu
+
+
+La fonction \verb|decoupage_ef| prend les m\^emes \'el\'ements en entr\'ee (avec les emplois finals au lieu des TEI) et cr\'ee pour chaque pays les emplois finals domestiques et les import\'es, pays par pays.
+
+ Ces d\'ecoupages sont n\'ecessaires pour des raisons de performance.
+
+\subsubsection{Calcul des contenus internationaux}
+
+Le programme permet ensuite de calculer les contenus en valeur ajout\'ee et en importation. La fonction \verb|contenus_va_inter| calcule le contenu en valeur ajoutée d'un emploi final (Consommation des ménages, investissement ou exportations) et le ventile par pays de provenance. On prend ici l'exemple de la consommation des ménages.
+
+Ensuite, la fonction \verb|contenus_imp_inter| calcule le contenu en importation (total, direct et indirect) d'un emploi final et le ventile par pays de provenance. On prend ici l'exemple de la consommation des ménages.
+
+Ces deux fonctions utilisent les tables qui viennent d'\^etre cr\'eer par le d\'ecoupage de la section pr\'ec\'edente.
+
+\subsubsection{Effet d'un choc exog\`ene de demande finale}
+
+Premi\`erement, on cr\'ee une variation exog\`ene de demande finale internationale. On peut cr\'eer une variation de demande finale en un ou plusieurs produits, pour un ou plusieurs pays. Si plusieurs produits sont concern\'es, les variations de production des autres pays sont ventil\'ees selon le pays d'origine de la variation.
+
+Ensuite, la fonction \verb|variation_prod_inter| donne la variation de production (totale, directe et indirecte) qui en d\'ecoule ainsi que la matrice de production apr\`es cette variation de demande finale.
+
+Avec la fonction \verb|variation_imp_inter|, on calcule la variation des importations par pays de provenance et par produit pour le pays qui subit le choc de demande finale simul\'e, pays que l'on pr\'ecise comme param\`etre de la fonction. Cette fonction fournit aussi les importations par produit et pays de provenance avant et apr\`es variation.
+
+\subsubsection{Effet d'un choc exog\`ene de prix}
+
+La fonction \verb|variation_prix_inter| permet de calculer la variation du prix de production des produits suite \`a un choc exog\`ene de prix pour un produit en param\`etre. On simule un choc de prix sur un produit (dont le num\'ero\footnote{voir \ref{1}} est pr\'ecis\'e en param\`etre) dans un pays dont le num\'ero dans la liste des pays est pr\'ecis\'e en param\`etre. Ce choc est exprim\'e en pourcentage dans les param\`etres de la fonction qui retourne les variations (totales, directes et indirectes) par produit et par pays du prix des produits en pourcentage.
+
+\subsection{Agr\'egation et niveaux de nomenclature}
+
+La partie suivante d\'ecrit des fonctions utiles pour agr\'eger des donn\'ees \`a des niveaux de nomenclature moins fins. Par exemple pour passer d'un niveau 38 produits \`a un niveau 17 produits. Pour cela, il est n\'ecessaire de charger le package \verb|sqldf| qui permet de r\'ealiser des requ\^etes SQL. Il faut aussi charger les diff\'erentes tables de passage qui sont fournies dans le cadre de l'ouverture d'Avionic.
+
+On charge une table \verb|testAgreg| qui va nous permettre de tester les fonctions d'agr\'egations pour une variable exemple \verb|valeur|.
+
+La premi\`ere fonction \verb|Agreg_NA| permet d'agr\'eger un vecteur \`a tout niveau de nomenclature NA d'activit\'e \'economique. Les diff\'erents niveaux possibles sont notamment NA10, NA17, NA38, NA64, NA88.
+
+Il faut que le nom de la colonne de nomenclature a agr\'eger porte le nom de sa nomenclature, par exemple "NA17".
+
+
+
+La fonction prend en entr\'ee : 
+\begin{itemize}
+\item Le vecteur en entr\'ee : il s'agit du nom de la table contenant la variable \`a agr\'eger ainsi que le niveau de nomenclature de d\'epart
+\item Le nom de la variable a agr\'eger 
+\item Le niveau de nomenclature initial
+\item Le niveau de nomenclature voulu (qui doit \^etre moins fin que le niveau de nomenclature initial.
+\end{itemize}
+
+La fonction cr\'ee en variable globale une table "\verb|TabAfter|" qui contient les valeurs agr\'eg\'ees pour la variable voulue, renomm\'ee "\verb|VAL|"
+
+Ensuite, on teste la fonction \verb|Agreg_NA_fonc| qui permet d'agr\'eger un vecteur de tout niveau NA (produits) en nomenclature fonctionnelle (COICOP\footnote{Classification Of Individual Consumption by purpose ou Classification des fonctions de consommation des m\'enages} au niveau 1 et 2). C'est particuli\`erement int\'eressant pour appliquer le compte des m\'enages par cat\'egorie et obtenir des d\'ecompositions par CSP, \^age, ou quintile de revenus. 
+
+Cette fonction prend en entr\'ee un niveau de nomenclature de d\'epart et une table comprenant une variable r\'epartie \`a ce niveau de nomenclature ainsi que le nom de la variable. Dans l'exemple, la variable est une variable "\verb|VAL|" issue de la fonction pr\'ec\'edente.
+
+La fonction cr\'ee en variable globale une table "\verb|TabAfter_fonc_niv1et2COICOP|" contenant la r\'epartition de la variable suivant la nomenclature fonctionnelle, sous le nom "\verb|VAL_FONC|"
+
+
+\subsection{Compte des m\'enages par cat\'egories}
+
+L'\'etape pr\'ec\'edente est un pr\'erequis \`a l'\'etude de la variable consid\'er\'ee sous l'angle du compte des m\'enages par cat\'egories
+
+Premi\`erement, on charge la table de structure du compte des m\'enages par cat\'egories. Il s'agit d'une table r\'epartissant la consommation des m\'enages en nomenclature fonctionnelle (COICOP au niveau 1 et 2) suivant plusieurs cat\'egories :
+\begin{itemize}
+\item Quintiles de revenus
+\item \^Ages
+\item Composition du m\'enage
+\item CSP
+\item des croisements de ces variables
+\end{itemize}
+
+Typiquement, on va regarder notre table "\verb|TabAfter_fonc_niv1et2COICOP|" obtenue \`a l'\'etape pr\'ec\'edente \`a travers ces cat\'egories.
+
+Pour cela, on utilise la fonction \verb|Ventile_Vecteur| pour r\'epartir notre variable "\verb|Val_fonc|" suivant les diff\'erentes d\'ecompositions. 
+
+On obtient en variable globale une table \verb|Tab_struct_CMpC_foisVecteur| qui est ensuite utilis\'ee en entr\'ee de la fonction \verb|resultat_CMpC|. Cette fonction cr\'ee en variable globale une table \verb|TabAgreg| qui contient trois lignes qui correspondent \`a la d\'ecomposition par cat\'egories de la variable \'etudi\'ee calcul\'ee \`a trois niveaux d'agr\'egation diff\'erent. 
+
+La premi\`ere correspond aux r\'esultat obtenus en agr\'egeant au niveau 1 de la COICOP, la deuxi\`eme en agr\'egeant au niveau 2, et la troisi\`eme en calculant directement \`a partir de la ligne "D\'epense de consommation par m\'enage" de la table de structure du compte des m\'enages par cat\'egories, ce qui correspond \`a une sorte de niveau 0. A priori, les r\'esultats sont plus pr\'ecis en utilisant l'agr\'egation issue du niveau le plus fin (ici le niveau 2).
+
+\section{Conclusion}
+
+Le programme \verb|tuto_avionic| permet donc de mettre en \oe{}uvre les principales utilisations d'Avionic dans le cadre de la comptabilit\'e nationale. Notamment les calculs de contenus, les r\'eponses \`a des chocs de demande finale ou de prix, le tout \`a un niveau national et international. Il est aussi possible d'\'etudier les donn\'ees \`a travers le compte des m\'enages par cat\'egories, ainsi qu'\`a diff\'erents niveaux de nomenclature.
+
+Ces programmes sont mis \`a la disposition de tous, les donn\'ees sont disponibles sur le site de l'Insee, de l'OCDE (base TiVA) ou d'Eurostat (base FIGARO). Le document de travail expliquant le mod\`ele est aussi disponible sur le site de l'Insee. L'\'equipe travaillant sur Avionic est joignable \`a \href{mailto:francois.limousin@insee.fr}{francois.limousin@insee.fr} ou \href{mailto:alexandre.bourgeois@insee.fr}{alexandre.bourgeois@insee.fr} pour des questions ou retours d'exp\'eriences.
+
+\end{document}
+
+
+
+
+
+
+
+
+
