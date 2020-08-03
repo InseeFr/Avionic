@@ -13,6 +13,8 @@ Contents :
 
 There is also a tutorial video here : https://www.youtube.com/watch?v=0zQVsNSFp3c&feature=youtu.be
 
+The file named "emploi_sal_2015.csv" in the main program has been renamed "eqtp_2015.csv" in the upload
+
 **How to use it**
 
 You can use the programs directly. You can find here data you can use to test the model. To help you, we made both a written tutorial and a video tutorial. There are both in French for now. You can apply the fonctions on all sorts of data, feel free to try on any country for instance. You just need an input-output table to make it work.
