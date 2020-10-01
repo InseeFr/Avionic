@@ -33,6 +33,6 @@ Our next steps :
 
 **How to get in touch**
 
-You can contact us by email or here on github, feel free to ask us questions and please, share your work with us
+You can contact us by email (avionic@insee.fr) or here on github, feel free to ask us questions and please, share your work with us
 
 
