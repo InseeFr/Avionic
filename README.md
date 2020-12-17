@@ -3,6 +3,9 @@
 The Avionic model is an input/output model that was developed at INSEE's National Accounts Department. This department produces summary tables that describe the national economy, such as the input-output table (IOT), which analyses each of the economy's products according to its origin (national production or imports) and its destination (final consumption, exports, investments). At its core, the IOT (input-output table) identifies the intermediate consumption of each branch of the economy in each product of the economy. It is therefore a valuable tool for tracing the interrelationships within the economy. In addition, over the last fifteen years or so, international organisations have developed inter-country IOTs by reconciling foreign trade data, thus making it possible to analyse global value chains.
 The programs have been developed in R, source data and other tables are in CSV or R format.
  
+Warning : 
+we found two bugs, one in the variation_emploi function and one in the agreg_NA function. We are working on this to fix it.
+ 
 Contents :
 
 - R programs. The main one is tuto_avionic.R. It calls the other programs when required
