@@ -4,7 +4,7 @@ The Avionic model is an input/output model that was developed at INSEE's Nationa
 The programs have been developed in R, source data and other tables are in CSV or R format.
  
 Warning : 
-we found two bugs, one in the variation_emploi function and one in the agreg_NA function. We are working on this to fix it.
+Be careful when agregating, there are a lot of possibility for errors.
  
 Contents :
 
