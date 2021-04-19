@@ -1,4 +1,4 @@
-### Travail préparatoire, import de données
+### Travail prÃ©paratoire, import de donnÃ©es
 
 rm(list=ls())
 
@@ -10,12 +10,12 @@ chemin_prog="C:/Users/letch/Documents/Travail/Insee/2019_conso_menages/programme
 
 
 
-## imports de données
+## imports de donnÃ©es
 setwd(chemin_prog)
 getwd()
 source("fonctions.R")
 
-## Données TES français##
+## DonnÃ©es TES franÃ§ais##
 
 setwd(dir = chemin_data)
 tei_imp <- matrice(fichier = "tei_imp_2015.csv")
@@ -50,7 +50,7 @@ res.contenus_va <- contenus_va(prod, tei_dom, tei_imp, ef_d, ef_i)
 res.contenus_emploi <- contenus_emploi(prod, tei_dom, ef_d, emploi)
 
 
-### Réponse à une variation de demande finale
+### RÃ©ponse Ã  une variation de demande finale
 source("variation_df.R")
 
 ### Impact sur la production nationale
@@ -63,9 +63,9 @@ res.variation_imp <- variation_imp(prod, tei_dom, tei_imp, df_d, df_i, var_df)
 
 ### Impact sur l'emploi
 
-res.variation_emp <- variation_emploi(prod, tei_dom, df_d, var_df, emploi)
+res.variation_emp <- variation_emploi(prod, tei_dom, df_d, emploi, var_df)
 
-### Réponse à une variation de prix 
+### RÃ©ponse Ã  une variation de prix 
 
 source("variation_prix.R")
 
@@ -77,7 +77,7 @@ res.variation_prix_coeff <- variation_prix(tei_dom, prod, 9, 50, coeff_trans)
 ############################### Calculs au niveau international #########################################
 
 
-### import des données internationales de l'OCDE
+### import des donnÃ©es internationales de l'OCDE
 
 install.packages("stringr", dependencies=TRUE)   # package pour fonction str_sub
 library(stringr)
@@ -98,7 +98,7 @@ for(j in 1:69){
 }
 pays_2 <- pays[1:64]
 
-### Découpage des données en fichiers fins
+### DÃ©coupage des donnÃ©es en fichiers fins
 setwd(chemin_prog)
 
 source("decoupage_international.R")
@@ -127,11 +127,11 @@ source("contenus_international.R")
 res.contenus_va_inter <- contenus_va_inter(prod_tiva, tei_tiva, conso_tiva)
 res.contenus_imp_inter <- contenus_imp_inter(paste0(chemin_data_inter,"/2015"),"Stockage des TEI","Stockage des productions","Stockage des emplois finals",pays, pays_2)
 
-### Réponse à une variation de demande finale
+### RÃ©ponse Ã  une variation de demande finale
 
 setwd(chemin_prog)
 
-# création d'une matrice de variation de demande finale internationale
+# crÃ©ation d'une matrice de variation de demande finale internationale
 var_conso_inter <- matrix(0, nrow = nrow(conso_tiva), ncol = ncol(conso_tiva))
 var_conso_inter[1,1]<- 10000
 
@@ -145,14 +145,14 @@ var_df_inter_fra <- matrice(fichier = "var_df_inter_fra.csv")
 
 res.var_imp_inter <- var_imp_inter(paste0(chemin_data_inter,"/2015"),"Stockage des TEI","Stockage des productions","Stockage des emplois finals",pays, "FRA", var_df_inter_fra)
 
-### Réponse à une variation de prix
+### RÃ©ponse Ã  une variation de prix
 setwd(chemin_prog)
 
 source("variation_prix_international.R")
 res.variation_prix_inter <- variation_prix_inter(prod_tiva, tei_tiva,1,10,36, 50)
 
 
-#################### Agrégation et compte des ménages par catégories ################################
+#################### AgrÃ©gation et compte des mÃ©nages par catÃ©gories ################################
 
 ### import des tables de passages
 setwd(dir = chemin_data_agregation)
@@ -173,20 +173,20 @@ tab_pass_TiVA <- read.csv(file="tab_pass_TiVA.csv", header=TRUE, sep=";")
 
 install.packages("sqldf")
 library(sqldf)# Library qui permet d executer des requetes SQL avec la clause GROUP BY
-#Ce package est utilisé par le programme d'agregation et par celui sur le compte des menages par categories
+#Ce package est utilisÃ© par le programme d'agregation et par celui sur le compte des menages par categories
 
 setwd(dir = chemin_prog)
 
 source("Avionic_agregation.R")
 
-### Agregation d'une valeur à différents niveaux, en nomenclature agrégée puis en nomenclature fonctionnelle
+### Agregation d'une valeur Ã  diffÃ©rents niveaux, en nomenclature agrÃ©gÃ©e puis en nomenclature fonctionnelle
 setwd(dir = chemin_data_agregation)
 
 # chargement d'une table de test
 testAgreg <- read.csv(file="testAgreg.CSV", header=TRUE, sep=";")
 
 
-# Agrégation 
+# AgrÃ©gation 
 Agreg_NA(testAgreg, "Valeur","NA129","NA17")
 
 
@@ -194,7 +194,7 @@ Agreg_NA(testAgreg, "Valeur","NA129","NA17")
 Agreg_NA_fonc("NA17",TabAfter,"VAL")
 
 
-### Travaux sur le Compte des ménages par catégories (CMpC)
+### Travaux sur le Compte des mÃ©nages par catÃ©gories (CMpC)
 
 # chargement de la structure de la consommation des menages par categories
 Tab_Struct_CMpC <- read.csv(file="Tab_Struct_CMpC.csv", header=TRUE, sep=";")
@@ -202,7 +202,7 @@ Tab_Struct_CMpC <- read.csv(file="Tab_Struct_CMpC.csv", header=TRUE, sep=";")
 setwd(chemin_prog)
 
 source("Avionic_CMpC.R")
-# attention, le package "sqldf" est nécessaire aux fonctions de ce programme
+# attention, le package "sqldf" est nÃ©cessaire aux fonctions de ce programme
 
 Ventile_Vecteur(TabAfter_fonc_niv1et2COICOP)
 resultat_CMpC(Tab_struct_CMpC_foisVecteur)
