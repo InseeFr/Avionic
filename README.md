@@ -5,6 +5,7 @@ The programs have been developed in R, source data and other tables are in CSV o
  
 Warning : 
 Be careful when agregating, there are a lot of possibility for errors.
+For 2020 and 2021, passage tables from NACE to COICOP are not stable (especially for some items like masks), so be careful if you want to use data from here to make model for 2020 and 2021
  
 Contents :
 
